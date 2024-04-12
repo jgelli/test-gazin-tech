@@ -1,8 +1,11 @@
 BACKEND_CONTAINER = backend
 
 
-backend-db-migrate:
+backend-db-push:
 	docker-compose exec $(BACKEND_CONTAINER) npx prisma db push
+
+backend-db-migrate:
+	docker-compose exec $(BACKEND_CONTAINER) npx prisma migrate dev
 
 backend-db-generate:
 	docker-compose exec $(BACKEND_CONTAINER) npx prisma migrate dev --create-only
