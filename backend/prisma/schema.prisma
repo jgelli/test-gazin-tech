@@ -17,8 +17,7 @@ model Desenvolvedor {
   id              Int       @id @default(autoincrement())
   nome            String
   sexo            String
-  datanascimento  DateTime  @db.Date
-  idade           Int?      
+  datanascimento  DateTime  @db.Date 
   hobby           String
   nivel           Nivel     @relation(fields: [nivelId], references: [id])
   nivelId         Int

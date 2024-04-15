@@ -4,7 +4,6 @@ CREATE TABLE "Desenvolvedor" (
     "nome" TEXT NOT NULL,
     "sexo" TEXT NOT NULL,
     "datanascimento" DATE NOT NULL,
-    "idade" INTEGER,
     "hobby" TEXT NOT NULL,
     "nivelId" INTEGER NOT NULL,
 
