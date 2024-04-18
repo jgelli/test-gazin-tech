@@ -1,21 +1,5 @@
 version: '3.8'
 services:
-  backend:
-    build:
-      context: ./backend/
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./backend:/usr/src/api
-    environment:
-      - NODE_ENV=${NODE_ENV:-production}
-      - DATABASE_URL=${DATABASE_URL}
-    depends_on:
-      - postgres
-    command: yarn start:dev
-    networks:
-      - backend_network
-
   postgres:
     image: postgres
     restart: unless-stopped
@@ -25,22 +9,42 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
     networks:
       - backend_network
-  
-  pgadmin:
-    image: dpage/pgadmin4
-    ports:
-      - "8080:80"
+      
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     environment:
-      PGADMIN_DEFAULT_EMAIL: juan@teste.com
-      PGADMIN_DEFAULT_PASSWORD: 123
+      - NODE_ENV=${NODE_ENV:-production}
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - "3000:3000"
     depends_on:
       - postgres
     networks:
       - backend_network
+      - frontend_network
+
+  
+  
+  frontend:
+    build: 
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+    networks:
+      - frontend_network
       
 networks:
   backend_network:
+    driver: bridge
+  frontend_network:
     driver: bridge
   
