@@ -33,7 +33,7 @@ Push the migration to database
     make backend-db-push
 ```
 
-Access the backend documentation in `localhost:3000`
+Access the backend documentation in `localhost:3000/docs`
 
 The frontend will be available on the route `localhost:8080`
     
