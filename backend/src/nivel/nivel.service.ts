@@ -54,7 +54,9 @@ export class NivelService {
         });
 
         if (desenvolvedores?.length) {
-            throw new BadRequestException('Há desenvolvedores cadastrados nesse nível.');
+            throw new BadRequestException(
+                'It is not possible to delete this level. There developers in this level.',
+            );
         }
 
         await this.prisma.nivel.delete({

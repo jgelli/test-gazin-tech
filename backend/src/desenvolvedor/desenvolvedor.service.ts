@@ -8,20 +8,39 @@ import { DesenvolvedorEntity } from './entities/desenvolvedor.entity';
 export class DesenvolvedorService {
     constructor(private prisma: PrismaService) {}
 
-    async findAll(): Promise<DesenvolvedorEntity[]> {
-        const desenvolvedores = await this.prisma.desenvolvedor.findMany();
+    async findAll(
+        page: number,
+        perPage: number,
+    ): Promise<{ hasNext: boolean; desenvolvedores: DesenvolvedorEntity[] }> {
+        const skip = (page - 1) * perPage;
+
+        const [desenvolvedores, total] = await Promise.all([
+            this.prisma.desenvolvedor.findMany({
+                include: {
+                    nivel: true,
+                },
+                skip,
+                take: perPage,
+            }),
+            this.prisma.desenvolvedor.count(),
+        ]);
 
         if (!desenvolvedores?.length) {
             throw new NotFoundException();
         }
 
-        return desenvolvedores;
+        const hasNext = page * perPage < total;
+
+        return { hasNext, desenvolvedores };
     }
 
     async findOne(id: number): Promise<DesenvolvedorEntity | null> {
         const desenvolvedor = await this.prisma.desenvolvedor.findUnique({
             where: {
                 id,
+            },
+            include: {
+                nivel: true,
             },
         });
 
@@ -33,6 +52,14 @@ export class DesenvolvedorService {
     }
 
     async create(data: CreateDesenvolvedorDto): Promise<DesenvolvedorEntity> {
+        const { nivelId } = data;
+
+        const nivel = await this.prisma.nivel.findUnique({ where: { id: nivelId } });
+
+        if (!nivel) {
+            throw new NotFoundException(`Theres no level with id: ${nivelId}`);
+        }
+
         return this.prisma.desenvolvedor.create({
             data,
         });
@@ -59,7 +86,7 @@ export class DesenvolvedorService {
                 },
             });
         } catch (error) {
-            throw new BadRequestException('Erro durante remoção');
+            throw new BadRequestException('Error deleting developer');
         }
     }
 }

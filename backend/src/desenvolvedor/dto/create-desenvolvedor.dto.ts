@@ -5,8 +5,8 @@ import {
     IsInt,
     IsString,
     MaxLength,
-    IsOptional,
     IsNotEmpty,
+    IsIn,
 } from 'class-validator';
 
 export class CreateDesenvolvedorDto {
@@ -17,6 +17,7 @@ export class CreateDesenvolvedorDto {
     @IsString()
     @MaxLength(1)
     @IsNotEmpty()
+    @IsIn(['M', 'F', 'O'], { message: 'sexo must be one of M, F, or O' })
     @ApiProperty({ required: true, example: 'M' })
     sexo: string;
 
@@ -27,11 +28,6 @@ export class CreateDesenvolvedorDto {
     @IsDateString({}, { message: 'datanascimento must be a valid date' })
     @ApiProperty({ required: true })
     datanascimento: Date;
-
-    @IsOptional()
-    @IsInt()
-    @ApiProperty()
-    idade: number;
 
     @IsNotEmpty()
     @IsString()

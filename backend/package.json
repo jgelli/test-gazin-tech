@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node ./dist/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "generate": "npx prisma generate --schema=./prisma/schema.prisma",
     "migrate": "npx prisma migrate dev --schema=./prisma/schema.prisma --name add --preview-feature --create-only",
-    "deploy": "npx prisma migrate deploy --schema=./prisma/schema.prisma --preview-feature"
+    "deploy": "npx prisma migrate deploy --schema=./prisma/schema.prisma --preview-feature",
+    "db-push": "npx prisma db push"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

@@ -3,7 +3,7 @@ import { DesenvolvedorEntity } from './entities/desenvolvedor.entity';
 import { DesenvolvedorService } from './desenvolvedor.service';
 import { CreateDesenvolvedorDto } from './dto/create-desenvolvedor.dto';
 import { UpdateDesenvolvedorDto } from './dto/update-desenvolvedor.dto';
-import { DesenvolvedorDto } from './dto/desenvolvedor.dto';
+import { DesenvolvedorDto, DesenvolvedorPaginate } from './dto/desenvolvedor.dto';
 import {
     Body,
     Controller,
@@ -16,6 +16,9 @@ import {
     ValidationPipe,
     HttpStatus,
     HttpCode,
+    UseInterceptors,
+    ClassSerializerInterceptor,
+    Query,
 } from '@nestjs/common';
 
 @ApiTags('desenvolvedor')
@@ -23,16 +26,27 @@ import {
 export class DesenvolvedorController {
     constructor(private readonly desenvolvedorService: DesenvolvedorService) {}
 
+    @UseInterceptors(ClassSerializerInterceptor)
     @Get()
-    @ApiResponse({ status: HttpStatus.OK, type: [DesenvolvedorDto] })
-    async findAll(): Promise<DesenvolvedorDto[]> {
-        const desenvolvedores = await this.desenvolvedorService.findAll();
-        return desenvolvedores.map(this.formatDate);
+    @ApiResponse({ status: HttpStatus.OK, type: DesenvolvedorPaginate })
+    async findAll(
+        @Query('page', ParseIntPipe) page: number,
+        @Query('perPage', ParseIntPipe) perPage: number,
+    ): Promise<{ page: number; hasNext: boolean; desenvolvedores: DesenvolvedorDto[] }> {
+        if (perPage > 50) perPage = 50;
+
+        const { hasNext, desenvolvedores } = await this.desenvolvedorService.findAll(page, perPage);
+        return {
+            page,
+            hasNext: hasNext,
+            desenvolvedores: desenvolvedores.map(this.formatDate),
+        };
     }
 
+    @UseInterceptors(ClassSerializerInterceptor)
     @Get(':id')
     @ApiResponse({ status: HttpStatus.OK, type: DesenvolvedorDto })
-    async findOne(@Param('id', ParseIntPipe) id: number): Promise<DesenvolvedorDto | null> {
+    async findOne(@Param('id', ParseIntPipe) id: number): Promise<DesenvolvedorDto> {
         const desenvolvedor = await this.desenvolvedorService.findOne(id);
         return this.formatDate(desenvolvedor);
     }
@@ -53,7 +67,9 @@ export class DesenvolvedorController {
         @Param('id', ParseIntPipe) id: number,
         @Body(ValidationPipe) updateDesenvolvedorDto: UpdateDesenvolvedorDto,
     ): Promise<DesenvolvedorDto> {
-        this.parseDate(updateDesenvolvedorDto);
+        if (updateDesenvolvedorDto?.datanascimento) {
+            this.parseDate(updateDesenvolvedorDto);
+        }
         const desenvolvedor = await this.desenvolvedorService.update({
             id,
             data: updateDesenvolvedorDto,
