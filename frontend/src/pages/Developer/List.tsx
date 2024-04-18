@@ -158,7 +158,7 @@ const ListDeveloper: React.FC = () => {
               Anterior
             </Button>
           )}
-          <Button mx={1}>{currentPage}</Button>
+          {hasNextPage && <Button mx={1}>{currentPage}</Button>}
           {hasNextPage && (
             <Button onClick={() => handlePageChange(currentPage + 1)} mx={1}>
               Próxima
